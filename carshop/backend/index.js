@@ -8,7 +8,20 @@ async function main() {
 
   try {
     await client.connect();
-    await listDatabases(client);
+
+    await createListings(client, [
+      {
+        summary: "First",
+        bathrooms: 1,
+        bedrooms: 1,
+        age: 23,
+      },
+      {
+        summary: "Second",
+        bathrooms: 1,
+        bedrooms: 1,
+      },
+    ]);
   } catch (e) {
     console.error(e);
   } finally {
@@ -18,6 +31,7 @@ async function main() {
 
 main().catch(console.error);
 
+//list all dbs
 async function listDatabases(client) {
   const databasesList = await client.db().admin().listDatabases();
 
@@ -25,4 +39,25 @@ async function listDatabases(client) {
   databasesList.databases.forEach((db) => {
     console.log(`- ${db.name}`);
   });
+}
+//insert one
+async function createListing(client, newListing) {
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingAndReviews")
+    .insertOne(newListing);
+
+  console.log(
+    `New listing created with the folowing id : ${result.insertedId}`
+  );
+}
+//insert many
+async function createListings(client, newListings) {
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingAndReviews")
+    .insertMany(newListings);
+
+  console.log(`${result.insertedCount}`);
+  console.log(result.insertedIds);
 }
